@@ -16,8 +16,8 @@ fn main() {
         ],
         vec![0.0, 1.0, 1.0, 0.0],
         0.0,
-        10_000,
-        true,
+        1_000,
+        false,
         rand::thread_rng()
     );
     perceptron.train();

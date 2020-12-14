@@ -13,6 +13,8 @@ use crate::vec_math::{
     dot_product,
     scalar_multiply,
     vector_add,
+    vector_add_mut,
+    scalar_multiply_mut,
 };
 
 pub struct Perceptron {
@@ -28,10 +30,6 @@ const EPOCH_DEBUG: bool = false;
 impl Perceptron {
     fn forward_pass(&self, vec: &Vec<f64>) -> f64 {
         sigmoid(dot_product(&self.weights, vec) + self.bias)
-    }
-
-    fn weight_gradients(&self, weights: &Vec<f64>, bias: f64) -> Vec<f64> {
-        scalar_multiply(weights, bias)
     }
 
     fn bias_gradient(&self, predicted: f64, actual: f64) -> f64 {
@@ -93,15 +91,17 @@ impl Perceptron {
             for (i, x) in self.input.iter().enumerate() {
                 let predicted = self.forward_pass(x);
                 d_bias += self.bias_gradient(predicted, self.actual_output[i]);
-                d_weights = vector_add(&d_weights, &self.weight_gradients(x, d_bias));
+                d_weights = vector_add(&d_weights, &scalar_multiply(x, d_bias));
+                // vector_add_mut(&mut d_weights, &scalar_multiply(x, d_bias));
             }
             d_weights = scalar_multiply(&d_weights, 2.0 / self.actual_output.len() as f64);
+            // scalar_multiply_mut(&mut d_weights, 2.0 / self.actual_output.len() as f64);
 
             self.weights = vector_add(&self.weights, &d_weights);
+            // vector_add_mut(&mut self.weights, &d_weights);
             self.bias += d_bias * 2.0 / self.actual_output.len() as f64;
             self.epoch_info(epoch, &d_weights);
 
-            // Terminates the training cycle early if a 
             if self.terminate_early(&d_weights) {
                 break;
             }

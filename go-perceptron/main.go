@@ -7,24 +7,24 @@ import (
 	"time"
 	"math"
 	"fmt"
-	"github.com/notnil/chess"
+	// "github.com/notnil/chess"
 )
 
 func main() {
 
-	game := chess.NewGame()
-	// generate moves until game is over
+	// game := chess.NewGame()
+	// // generate moves until game is over
 
-	var record []string
-	for game.Outcome() == chess.NoOutcome {
-		// select a random move
-		moves := game.ValidMoves()
-		move := moves[rand.Intn(len(moves))]
-		game.Move(move)
-		record = append(record, make([]string, moves))
-	}
+	// var record []string
+	// for game.Outcome() == chess.NoOutcome {
+	// 	// select a random move
+	// 	moves := game.ValidMoves()
+	// 	move := moves[rand.Intn(len(moves))]
+	// 	game.Move(move)
+	// 	record = append(record, make([]string, moves))
+	// }
 	
-	fmt.Println(record)
+	// fmt.Println(record)
 
 	goPerceptron := Perceptron{
 		input:        [][]float64{{0, 0, 1}, {1, 1, 1}, {1, 0, 1}, {0, 1, 0}}, //Input Data
@@ -98,6 +98,7 @@ func (a *Perceptron) gradB(x []float64, y float64) float64 { //Calculate Gradien
 
 
 func (a *Perceptron) train() { //Train the Perceptron for n epochs
+	start := time.Now()
 	for i := 0; i < a.epochs; i++ {
 		dw := make([]float64, len(a.input[0]))
 		db := 0.0
@@ -109,5 +110,8 @@ func (a *Perceptron) train() { //Train the Perceptron for n epochs
 		a.weights = vecAdd(a.weights, dw)
 		a.bias += db * 2 / float64(len(a.actualOutput))
 	}
+	stop := time.Now()
+	elapsed := stop.Sub(start)
+	fmt.Println(elapsed)
 }
 
