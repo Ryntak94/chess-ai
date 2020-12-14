@@ -1,6 +1,14 @@
 1_000 iterations
 
-#1 rust [mutable vectors]
+#1 rust [mutable arrays]
+    097.8µs
+    097.3µs
+    098.5µs
+    080.7µs
+    084.1µs
+avg 091.7µs
+
+#2 rust [mutable vectors]
     640.6µs
     487.5µs
     506.8µs
@@ -8,7 +16,7 @@
     587.7µs
 avg 550.0µs
 
-#2 go [mutable arrays]
+#3 go [mutable arrays]
     644.7µs
     735.5µs
     707.3µs
@@ -16,11 +24,10 @@ avg 550.0µs
     631.1µs
 avg 693.7µs
 
-#3 rust [immutable vectors]
+#4 rust [immutable vectors]
     862.2µs
     908.2µs
     884.7µs
     842.6µs
     807.9µs
 avg 861.1µs
-

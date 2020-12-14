@@ -11,16 +11,15 @@ use {
 use crate::vec_math::{
     sigmoid,
     dot_product,
-    scalar_multiply,
-    // vector_add,
     vector_add_mut,
+    scalar_multiply,
     scalar_multiply_mut,
 };
 
 pub struct Perceptron {
-    input: Vec<Vec<f64>>,
-	actual_output: Vec<f64>,
-	weights: Vec<f64>,
+    input: [[f64; 3]; 4],
+	actual_output: [f64; 4],
+	weights: [f64; 3],
 	bias: f64,
     epochs: usize,
     terminate_early: bool,
@@ -28,7 +27,7 @@ pub struct Perceptron {
 const EPOCH_DEBUG: bool = false;
 
 impl Perceptron {
-    fn forward_pass(&self, vec: &Vec<f64>) -> f64 {
+    fn forward_pass(&self, vec: &[f64; 3]) -> f64 {
         sigmoid(dot_product(&self.weights, vec) + self.bias)
     }
 
@@ -36,7 +35,7 @@ impl Perceptron {
         -(predicted - actual) * predicted * (1.0 - predicted)
     }
 
-    fn epoch_info(&self, epoch: usize, d_weights: &Vec<f64>) {
+    fn epoch_info(&self, epoch: usize, d_weights: &[f64; 3]) {
         if EPOCH_DEBUG {
             println!(
                 "\r\nEpoch {} / {}\r\n  Bias:    {}\r\n  Weights: {:?}\r\n  d_weights: {:?}",
@@ -49,7 +48,7 @@ impl Perceptron {
         }
     }
  
-    fn terminate_early(&self, d_weights: &Vec<f64>) -> bool {
+    fn terminate_early(&self, d_weights: &[f64; 3]) -> bool {
         self.terminate_early
             && self
                 .weights
@@ -59,20 +58,21 @@ impl Perceptron {
     }
     
     pub fn from_rng<R: Rng>(
-        input: Vec<Vec<f64>>,
-        actual_output: Vec<f64>,
+        input: [[f64; 3]; 4],
+        actual_output: [f64; 4],
         bias: f64,
         epochs: usize,
         terminate_early: bool,
-        rng: R,  
+        rng: &mut R,  
     ) -> Self {
-        let weights_len = input.get(0).unwrap_or(&vec![]).len();
         Self {
             input,
             actual_output,
-            weights: rng.sample_iter(Uniform::new_inclusive(0.0, 1.0))
-                .take(weights_len)
-                .collect(),
+            weights: [
+                rng.sample(Uniform::new_inclusive(0.0, 1.0)),
+                rng.sample(Uniform::new_inclusive(0.0, 1.0)),
+                rng.sample(Uniform::new_inclusive(0.0, 1.0)),
+            ],
             bias,
             epochs,
             terminate_early,
@@ -86,7 +86,7 @@ impl Perceptron {
         
         for epoch in 0..self.epochs {
             let mut d_bias = 0.0;
-            let mut d_weights = self.weights.iter().map(|_| 0.0).collect();
+            let mut d_weights = [0.0, 0.0, 0.0];
 
             for (i, x) in self.input.iter().enumerate() {
                 let predicted = self.forward_pass(x);
@@ -113,7 +113,7 @@ impl Perceptron {
         println!("\r\nTraining duration: {:?}", stop_time - start_time);
     }
 
-    pub fn predict(&self, vec: &Vec<f64>) -> f64 {
+    pub fn predict(&self, vec: &[f64; 3]) -> f64 {
         sigmoid(dot_product(vec, &self.weights))
     }
 }
