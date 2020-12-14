@@ -130,3 +130,8 @@ dmypy.json
 
 /twicPGN
 /twicZips
+
+
+# Added by cargo
+
+/target
