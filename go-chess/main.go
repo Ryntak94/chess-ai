@@ -7,7 +7,7 @@ import (
 	// "time"
 	// "math"
 	"fmt"
-	// "github.com/notnil/chess"
+	"github.com/notnil/chess"
 )
 
 func main() {
@@ -15,16 +15,15 @@ func main() {
 	game := chess.NewGame()
 	// generate moves until game is over
 
-	var record []string
+	var record [][]*chess.Move
 	for game.Outcome() == chess.NoOutcome {
 		// select a random move
 		moves := game.ValidMoves()
 		move := moves[rand.Intn(len(moves))]
 		game.Move(move)
-		record = append(record, make([]string, moves))
+		record = append(record, moves)
 	}
 	
 	fmt.Println(record)
-
-	
+	fmt.Println(game.Position().Board().Draw())	
 }
