@@ -1,0 +1,4 @@
+{
+    "dockerFile": "Dockerfile",
+    "target": "build"
+}
