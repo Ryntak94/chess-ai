@@ -3,27 +3,67 @@ package main
 // https://towardsdatascience.com/neural-network-from-scratch-in-go-language-b98e2abcced3
 
 import (
-	"math/rand"
+	// "math/rand"
 	// "time"
-	// "math"
+	"math"
 	"fmt"
 	"github.com/notnil/chess"
+	"encoding/binary"
+	"strings"
+	"io/ioutil"
+	"regexp"
 )
 
 func main() {
-
-	game := chess.NewGame()
-	// generate moves until game is over
-
-	var record [][]*chess.Move
-	for game.Outcome() == chess.NoOutcome {
-		// select a random move
-		moves := game.ValidMoves()
-		move := moves[rand.Intn(len(moves))]
-		game.Move(move)
-		record = append(record, moves)
+	data, err := ioutil.ReadFile("../twicPGN/twic920.pgn")
+    if err != nil {
+        fmt.Println("File reading error", err)
+        return
 	}
 	
-	fmt.Println(record)
-	fmt.Println(game.Position().Board().Draw())	
+	gamePattern := regexp.MustCompile(`(?Us)1\..*(?-U)\d?/?\d-\d?/?\d`) 
+	games := gamePattern.FindAllString(string(data), -1)
+
+	var possibleStates [][]float64 
+	var actualStates []float64
+
+	for game := 0; game < 10; game++ {
+		pgn, err := chess.PGN(strings.NewReader(games[game]))
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		game := chess.NewGame(pgn)	
+		actualMoves := game.Moves()
+
+		game = chess.NewGame()
+		// fmt.Println(len(actualMoves))
+		for actualMove := 0; actualMove < len(actualMoves); actualMove++ {
+			moves := game.ValidMoves()
+
+			freeze_pos := game
+
+			var possibleStateList []float64
+			for move := 0; move < len(moves); move++ {
+				game.Move(moves[move])
+				pos, err := game.Position().Board().MarshalBinary()
+				if err != nil {
+					fmt.Println(err)
+				}
+				possibleStateList = append(possibleStateList, math.Float64frombits(binary.LittleEndian.Uint64(pos)))
+				// reset position
+				game = freeze_pos
+			}
+			game.Move(actualMoves[actualMove])
+			pos, err := game.Position().Board().MarshalBinary()
+			if err != nil {
+				fmt.Println(err)
+			}
+			actualStates = append(actualStates, math.Float64frombits(binary.LittleEndian.Uint64(pos)))
+			possibleStates = append(possibleStates, possibleStateList)
+		}	
+	}
+
+	fmt.Println(possibleStates)
+	fmt.Println(actualStates)
 }
