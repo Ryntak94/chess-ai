@@ -50,7 +50,7 @@ func main() {
 				if err != nil {
 					fmt.Println(err)
 				}
-				possibleStateList = append(possibleStateList, math.Float64frombits(binary.LittleEndian.Uint64(pos)))
+				possibleStateList = append(possibleStateList, Float64bits(pos)))
 				// reset position
 				game = freeze_pos
 			}
@@ -59,11 +59,15 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
-			actualStates = append(actualStates, math.Float64frombits(binary.LittleEndian.Uint64(pos)))
+			actualStates = append(actualStates, Float64bits(pos)))
 			possibleStates = append(possibleStates, possibleStateList)
 		}	
 	}
 
 	fmt.Println(possibleStates)
 	fmt.Println(actualStates)
+}
+
+func Float64bits(f uint64) float64 {
+	return *(*float64)(unsafe.Pointer(&f))
 }
